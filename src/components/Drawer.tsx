@@ -7,9 +7,12 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ArticleIcon from "@mui/icons-material/Article";
-import TextField from '@mui/material/TextField';
+import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
+
+import { addJournal, fetchTitles } from "../utils/db";
+import { useEffect, useState } from "react";
 
 type DrawerComponentProps = {
   open: boolean;
@@ -18,18 +21,55 @@ type DrawerComponentProps = {
 
 const list = ["ToDo", "Movies to watch", "Fav songs", "Dreams and aspirations"];
 
+// { title:"", content: "" }
+// key is title
+
 export const DrawerComponent = (props: DrawerComponentProps) => {
   const { open, setOpen } = props;
 
+  const [newTitle, setNewTitle] = useState("");
+
+  const [titles, setTitles] = useState<string[]>([]);
+
   const closeDrawer = () => setOpen(false);
+
+  const addHandler = () => {
+    addJournal({ title: newTitle, content: "" })
+      .then((res) => {
+        console.log(res);
+        updateTitles();
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
+
+  const updateTitles = () => {
+    fetchTitles()
+      .then((response) => {
+        setTitles(response);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
+
+  useEffect(() => {
+    updateTitles();
+  }, []);
 
   const DrawerList = (
     <Box
-      sx={{ height: '100%', width: 250, display: "flex", flexDirection: "column" }}
+      sx={{
+        height: "100%",
+        width: 250,
+        display: "flex",
+        flexDirection: "column",
+      }}
       role="presentation"
     >
       <List sx={{ flexGrow: 1 }}>
-        {list.map((listItem) => {
+        {titles.map((listItem) => {
           return (
             <ListItem key={listItem} disablePadding>
               <ListItemButton onClick={closeDrawer}>
@@ -43,10 +83,31 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
         })}
       </List>
       <Divider />
-      <Box component="form" sx={{ padding: '10px', display: 'flex', gap: '5px', alignItems: 'center' }}>
-        <TextField id="new-topic" label="Topic" variant="outlined" sx={{ width: 190 }} size="small" />
-        <IconButton color="primary" aria-label="add journal" sx={{ flexShrink: 1 }}>
-            <AddIcon />
+      <Box
+        component="form"
+        sx={{
+          padding: "10px",
+          display: "flex",
+          gap: "5px",
+          alignItems: "center",
+        }}
+      >
+        <TextField
+          id="new-topic"
+          label="Topic"
+          variant="outlined"
+          sx={{ width: 190 }}
+          size="small"
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+        />
+        <IconButton
+          color="primary"
+          aria-label="add journal"
+          sx={{ flexShrink: 1 }}
+          onClick={addHandler}
+        >
+          <AddIcon />
         </IconButton>
       </Box>
     </Box>
