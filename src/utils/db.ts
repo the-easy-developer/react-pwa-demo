@@ -106,7 +106,7 @@ export const fetchTitles: () => Promise<string[]> = () => {
       reject("can't open key cursor");
     };
 
-    keyCursor.onsuccess = (e) => {
+    keyCursor.onsuccess = () => {
       const cursor = keyCursor.result;
       if (!cursor) {
         console.log("Cursor null");
