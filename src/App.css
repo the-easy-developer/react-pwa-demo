@@ -5,8 +5,17 @@
   text-align: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.text-area-content {
+  flex-grow: 1;
+  font-family: inherit;
+  width: 100%;
+  font-size: 1.25rem;
+  font-weight: 400;
+  resize: none;
+  padding: 5px;
+  line-height: 1.5;
+}
+
+.text-area-content:focus {
+  outline: none;
 }

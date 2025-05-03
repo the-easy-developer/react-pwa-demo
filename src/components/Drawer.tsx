@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -12,17 +13,12 @@ import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 
 import { addJournal, fetchTitles } from "../utils/db";
-import { useEffect, useState } from "react";
+import { useSelectedTitleStore } from "../utils/store";
 
 type DrawerComponentProps = {
   open: boolean;
   setOpen: (a: boolean) => void;
 };
-
-const list = ["ToDo", "Movies to watch", "Fav songs", "Dreams and aspirations"];
-
-// { title:"", content: "" }
-// key is title
 
 export const DrawerComponent = (props: DrawerComponentProps) => {
   const { open, setOpen } = props;
@@ -30,6 +26,8 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
   const [newTitle, setNewTitle] = useState("");
 
   const [titles, setTitles] = useState<string[]>([]);
+
+  const setSelectedTitle = useSelectedTitleStore((state) => state.setSelectedTitle);
 
   const closeDrawer = () => setOpen(false);
 
@@ -54,68 +52,69 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
       });
   };
 
+  const listItemClickHandler = (item: string) => () => {
+    setSelectedTitle(item);
+    closeDrawer();
+  }
+
   useEffect(() => {
     updateTitles();
   }, []);
 
-  const DrawerList = (
-    <Box
-      sx={{
-        height: "100%",
-        width: 250,
-        display: "flex",
-        flexDirection: "column",
-      }}
-      role="presentation"
-    >
-      <List sx={{ flexGrow: 1 }}>
-        {titles.map((listItem) => {
-          return (
-            <ListItem key={listItem} disablePadding>
-              <ListItemButton onClick={closeDrawer}>
-                <ListItemIcon>
-                  <ArticleIcon />
-                </ListItemIcon>
-                <ListItemText primary={listItem} />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-      <Divider />
-      <Box
-        component="form"
-        sx={{
-          padding: "10px",
-          display: "flex",
-          gap: "5px",
-          alignItems: "center",
-        }}
-      >
-        <TextField
-          id="new-topic"
-          label="Topic"
-          variant="outlined"
-          sx={{ width: 190 }}
-          size="small"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-        />
-        <IconButton
-          color="primary"
-          aria-label="add journal"
-          sx={{ flexShrink: 1 }}
-          onClick={addHandler}
-        >
-          <AddIcon />
-        </IconButton>
-      </Box>
-    </Box>
-  );
-
   return (
     <Drawer open={open} onClose={closeDrawer}>
-      {DrawerList}
+      <Box
+        sx={{
+          height: "100%",
+          width: 250,
+          display: "flex",
+          flexDirection: "column",
+        }}
+        role="presentation"
+      >
+        <List sx={{ flexGrow: 1 }}>
+          {titles.map((listItem) => {
+            return (
+              <ListItem key={listItem} disablePadding>
+                <ListItemButton onClick={listItemClickHandler(listItem)}>
+                  <ListItemIcon>
+                    <ArticleIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={listItem} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+        <Divider />
+        <Box
+          component="form"
+          sx={{
+            padding: "10px",
+            display: "flex",
+            gap: "5px",
+            alignItems: "center",
+          }}
+        >
+          <TextField
+            id="new-topic"
+            label="Topic"
+            variant="outlined"
+            sx={{ width: 190 }}
+            size="small"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+          <IconButton
+            color="primary"
+            aria-label="add journal"
+            sx={{ flexShrink: 1 }}
+            onClick={addHandler}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+      </Box>
     </Drawer>
   );
 };

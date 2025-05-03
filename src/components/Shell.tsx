@@ -7,6 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { DrawerComponent } from "./Drawer";
+import { Journal } from "./Journal";
 
 export const Shell = () => {
   const [open, setOpen] = useState(false);
@@ -43,6 +44,7 @@ export const Shell = () => {
         </Toolbar>
       </AppBar>
       <DrawerComponent open={open} setOpen={setOpen} />
+      <Journal />
     </Box>
   );
 };
