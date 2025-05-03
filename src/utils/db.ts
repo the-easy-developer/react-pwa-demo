@@ -121,4 +121,104 @@ export const fetchTitles: () => Promise<string[]> = () => {
   });
 };
 
+export const getJournal: (t: string) => Promise<JournalType> = (
+  title: string
+) => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject("db is null");
+      return;
+    }
+
+    if (!title) {
+      reject("title is required");
+      return;
+    }
+
+    const txn = db.transaction(OBJECT_STORE_NAME, "readonly");
+
+    const objectStore = txn.objectStore(OBJECT_STORE_NAME);
+
+    const request = objectStore.get(title);
+
+    request.onerror = (event) => {
+      console.error("Error: journal not found", event);
+      reject("journal not found");
+    };
+
+    request.onsuccess = () => {
+      const data = request.result;
+      console.log("Journal found");
+      resolve(data);
+    };
+  });
+};
+
+export const updateJournal = (arg: JournalType) => {
+  const { title, content } = arg;
+
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject("db is null");
+      return;
+    }
+
+    if (!title) {
+      reject("title is required");
+      return;
+    }
+
+    const txn = db.transaction(OBJECT_STORE_NAME, "readwrite");
+
+    const objectStore = txn.objectStore(OBJECT_STORE_NAME);
+
+    const request = objectStore.get(title);
+
+    request.onerror = (event) => {
+      console.error("Error: while editing journal not found", event);
+      reject("journal not found");
+    };
+
+    request.onsuccess = () => {
+      const data = request.result;
+      data.content = content;
+
+      const requestUpdate = objectStore.put(data);
+
+      requestUpdate.onerror = (event) => {
+        console.error("Error: while editing journal", event);
+        reject("journal update failed");
+      };
+
+      requestUpdate.onsuccess = (event) => {
+        console.log("Journal updated", event);
+        resolve("journal updated");
+      };
+    };
+  });
+};
+
+export const deleteJournal = (title: string) => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject("db is null");
+      return;
+    }
+    const request = db
+      .transaction(OBJECT_STORE_NAME, "readwrite")
+      .objectStore(OBJECT_STORE_NAME)
+      .delete(title);
+
+    request.onsuccess = (event) => {
+      resolve("journal deleted");
+      console.log("Journal deleted", event);
+    };
+
+    request.onerror = (event) => {
+      console.error("Error: journal not deleted", event);
+      reject("journal could not be deleted");
+    };
+  });
+};
+
 export const getDbInstance = () => db;

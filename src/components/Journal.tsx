@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -8,6 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useSelectedTitleStore } from "../utils/store";
+import { getJournal, updateJournal, deleteJournal } from "../utils/db";
 
 const EmptyJournal = () => {
   return (
@@ -22,14 +23,47 @@ const EmptyJournal = () => {
 };
 
 export const Journal = () => {
-  const selectedTitle = useSelectedTitleStore((state) => state.selectedTitle);
+  const { selectedTitle, setSelectedTitle } = useSelectedTitleStore(
+    (state) => state
+  );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
+  const saveHandler = () => {
+    if (!textareaRef.current) {
+      return;
     }
+    updateJournal({ title: selectedTitle, content: textareaRef.current.value })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const deleteHandler = () => {
+    deleteJournal(selectedTitle)
+      .then((result) => {
+        console.log(result);
+        setSelectedTitle("");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getJournal(selectedTitle)
+      .then((result) => {
+        if (textareaRef.current) {
+          textareaRef.current.value = result.content;
+          textareaRef.current.focus();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, [selectedTitle]);
 
   return (
@@ -68,10 +102,12 @@ export const Journal = () => {
               ref={textareaRef}
             />
             <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-              <IconButton aria-label="delete">
+              <IconButton aria-label="delete" onClick={deleteHandler}>
                 <DeleteIcon />
               </IconButton>
-              <Button variant="contained"> Save </Button>
+              <Button variant="contained" onClick={saveHandler}>
+                Save
+              </Button>
             </Box>
           </Box>
         </Box>

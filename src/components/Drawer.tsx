@@ -27,7 +27,9 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
 
   const [titles, setTitles] = useState<string[]>([]);
 
-  const setSelectedTitle = useSelectedTitleStore((state) => state.setSelectedTitle);
+  const { setSelectedTitle, selectedTitle } = useSelectedTitleStore(
+    (state) => state
+  );
 
   const closeDrawer = () => setOpen(false);
 
@@ -35,7 +37,10 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
     addJournal({ title: newTitle, content: "" })
       .then((res) => {
         console.log(res);
+        setNewTitle("");
         updateTitles();
+        setSelectedTitle(newTitle);
+        closeDrawer();
       })
       .catch((e) => {
         console.error(e);
@@ -55,11 +60,11 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
   const listItemClickHandler = (item: string) => () => {
     setSelectedTitle(item);
     closeDrawer();
-  }
+  };
 
   useEffect(() => {
     updateTitles();
-  }, []);
+  }, [selectedTitle]);
 
   return (
     <Drawer open={open} onClose={closeDrawer}>
