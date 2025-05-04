@@ -27,13 +27,13 @@ export default defineConfig({
             src: "web-app-manifest-192x192.png",
             sizes: "192x192",
             type: "image/png",
-            purpose: "maskable",
+            purpose: "any",
           },
           {
             src: "web-app-manifest-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "maskable",
+            purpose: "any",
           },
         ],
       },
@@ -45,7 +45,7 @@ export default defineConfig({
       },
 
       devOptions: {
-        enabled: false,
+        enabled: true,
         navigateFallback: "index.html",
         suppressWarnings: true,
         type: "module",
