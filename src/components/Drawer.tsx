@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -62,6 +62,12 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
     closeDrawer();
   };
 
+  const keyDownHandler = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      addHandler();
+    }
+  };
+
   useEffect(() => {
     updateTitles();
   }, [selectedTitle]);
@@ -93,7 +99,6 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
         </List>
         <Divider />
         <Box
-          component="form"
           sx={{
             padding: "10px",
             display: "flex",
@@ -108,6 +113,7 @@ export const DrawerComponent = (props: DrawerComponentProps) => {
             sx={{ width: 190 }}
             size="small"
             value={newTitle}
+            onKeyDown={keyDownHandler}
             onChange={(e) => setNewTitle(e.target.value)}
           />
           <IconButton

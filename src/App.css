@@ -19,3 +19,8 @@
 .text-area-content:focus {
   outline: none;
 }
+
+.journal-saved-msg {
+  visibility: hidden;
+  text-transform: uppercase;
+}

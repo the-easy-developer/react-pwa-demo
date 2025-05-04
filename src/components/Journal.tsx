@@ -29,13 +29,25 @@ export const Journal = () => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const savedMsgRef = useRef<HTMLElement>(null);
+
   const saveHandler = () => {
     if (!textareaRef.current) {
       return;
     }
+    if (savedMsgRef.current) {
+      savedMsgRef.current.style.visibility = "hidden";
+      savedMsgRef.current.style.opacity = "1";
+      savedMsgRef.current.style.transition = "none";
+    }
     updateJournal({ title: selectedTitle, content: textareaRef.current.value })
       .then((result) => {
         console.log(result);
+        if (savedMsgRef.current) {
+          savedMsgRef.current.style.visibility = "visible";
+          savedMsgRef.current.style.transition = "opacity 3s linear";
+          savedMsgRef.current.style.opacity = "0";
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -86,7 +98,18 @@ export const Journal = () => {
             flexDirection: "column",
           }}
         >
-          <Typography variant="h6"> {selectedTitle} </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6"> {selectedTitle} </Typography>
+
+            <Typography
+              variant="subtitle1"
+              color="success"
+              className="journal-saved-msg"
+              ref={savedMsgRef}
+            >
+              Saved
+            </Typography>
+          </Box>
           <Divider sx={{ marginBottom: "1rem" }} />
           <Box
             sx={{
